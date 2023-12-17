@@ -50,6 +50,7 @@ bin_server=udp2raw_amd64 # or udp2raw_arm ...
 sudo docker run -d \
             --restart always \
             --network host \
+            --cap-add NET_ADMIN \
             --name $name_server \
             docker-udp2raw:latest \
             $bin_server -s -l 0.0.0.0:8855 -r 127.0.0.1:7777 -k "passwds" --raw-mode icmp --fix-gro --sock-buf 10240 --cipher-mode xor --auth-mode simple
