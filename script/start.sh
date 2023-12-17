@@ -19,7 +19,9 @@ bin="$1"
 shift
 extArgs="$@"
 
+echo "-----------------------------------------------------"
 echo "Starting $bin with args: $extArgs"
+echo "-----------------------------------------------------"
 
 # Execute the binary with arguments in the background
 $bin $extArgs 2>&1 &
