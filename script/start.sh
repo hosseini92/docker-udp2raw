@@ -1,24 +1,34 @@
 #!/bin/sh
 
-ip=$(wget -qO- -t1 -T2 ip.sb)
+# Function to exit the script and kill the background process gracefully
+exit_proc() {
+    kill -SIGTERM $child_pid
+}
 
-args="-r ${R_IP:-$ip}:$R_PORT"
-bin="$1"
-extArgs="${@:2}"
-
-echo $extArgs
-
-if [ -z "${extArgs##*' -r'*}" ]; then
-    echo "use R_IP / R_PORT instead of -r"
-    exit 1
-fi
-
-$bin $extArgs $args 2>&1 &
-
-finish(){
+# Function to perform cleanup and exit
+finish() {
+    exit_proc
     exit 0
 }
 
-trap finish SIGTERM SIGINT SIGQUIT # action after receive sig
+# Set trap for signals to invoke the 'finish' function
+trap finish SIGTERM SIGINT SIGQUIT
 
-while sleep 3600 & wait $!;do :;done;
+# Extract binary and additional arguments
+bin="$1"
+shift
+extArgs="$@"
+
+echo "Starting $bin with args: $extArgs"
+
+# Execute the binary with arguments in the background
+$bin $extArgs 2>&1 &
+child_pid=$!
+
+# Wait for the background process to terminate gracefully
+wait $child_pid
+
+# Keep the container running with a lightweight process
+while true; do
+    sleep 1
+done
