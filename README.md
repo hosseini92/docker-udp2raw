@@ -70,6 +70,13 @@ sudo docker run -d \
             $bin_client -c -l 0.0.0.0:3333 -r 127.0.0.1:8855  -k "passwds" --raw-mode icmp --fix-gro --sock-buf 10240 --cipher-mode xor --auth-mode simple
 ```
 
+### FakeTCP / Easy-FakeTCP note (important)
+
+For `--raw-mode faketcp` (and `easy-faketcp`), udp2raw **needs an iptables rule** to block kernel TCP processing (otherwise the kernel may send RST and break the tunnel). In Docker, this means:
+
+- run with `--cap-add NET_ADMIN` (so iptables can be managed)
+- include `-a` (and often `--wait-lock`) in udp2raw args
+
 ### Notice
 
 because udp2raw running on level 2, if not work correct, ~~maybe~~ **MUST** need add `--net=host`/`--cap-add=NET_ADMIN` or `network_mode:"host"`/`cap_add: NET_ADMIN` in compose **AND** remember to bypass udp port `1024-65535` from firewall

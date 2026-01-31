@@ -1,8 +1,13 @@
 FROM alpine:3.19
 
 # prepare everything
-RUN apk update
-RUN apk add vim lsof tar bind-tools
+RUN apk add --no-cache \
+    vim \
+    lsof \
+    tar \
+    bind-tools \
+    iptables \
+    iproute2
 
 WORKDIR /opt/udp2raw
 ENV PATH="/opt/udp2raw:${PATH}"
@@ -29,4 +34,4 @@ COPY script script
 
 # ENTRYPOINT ["udp2raw_amd64"]
 ENTRYPOINT [ "./script/start.sh" ]
-CMD ["udp2raw_amd64", "-s", "-l","0.0.0.0:1234", "--raw-mode", "faketcp", "-k", "passwd"]
+CMD ["udp2raw_amd64", "-s", "-l","0.0.0.0:1234", "-r", "127.0.0.1:7777", "--raw-mode", "faketcp", "-a", "--wait-lock", "-k", "passwd"]
